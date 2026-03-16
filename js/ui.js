@@ -1,5 +1,4 @@
 const UI = (() => {
-  // Screen elements
   const screens = {
     start: document.getElementById("screen-start"),
     question: document.getElementById("screen-question"),
@@ -7,7 +6,6 @@ const UI = (() => {
     results: document.getElementById("screen-results")
   };
 
-  // Question screen elements
   const elTopic = document.getElementById("q-topic");
   const elQuestion = document.getElementById("q-text");
   const elUnit = document.getElementById("q-unit");
@@ -16,7 +14,6 @@ const UI = (() => {
   const elProgress = document.getElementById("q-progress");
   const elProgressBar = document.getElementById("q-progress-bar");
 
-  // Feedback screen elements
   const elFeedbackIcon = document.getElementById("fb-icon");
   const elFeedbackTitle = document.getElementById("fb-title");
   const elFeedbackHint = document.getElementById("fb-hint");
@@ -25,16 +22,48 @@ const UI = (() => {
   const elFeedbackExplanation = document.getElementById("fb-explanation");
   const elFeedbackTip = document.getElementById("fb-tip");
 
-  // Results screen elements
   const elScore = document.getElementById("r-score");
   const elAccuracy = document.getElementById("r-accuracy");
   const elBreakdown = document.getElementById("r-breakdown");
-
-  let lastFeedbackEntry = null;
+  const elHistory = document.getElementById("r-history");
 
   function showScreen(name) {
     Object.values(screens).forEach(s => s.classList.remove("active"));
     screens[name].classList.add("active");
+  }
+
+  function renderStartScreen() {
+    renderHistoryOnStart();
+    showScreen("start");
+  }
+
+  function renderHistoryOnStart() {
+    const container = document.getElementById("start-history");
+    const history = Game.getHistory();
+    if (history.length === 0) {
+      container.style.display = "none";
+      return;
+    }
+
+    container.style.display = "block";
+    const recent = history.slice(-5).reverse();
+    let html = "<h3 class='history-title'>Recent Games</h3><div class='history-list'>";
+    for (const h of recent) {
+      const d = new Date(h.date);
+      const dateStr = d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+      const timeStr = d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+      html += `<div class="history-row">
+        <span class="history-date">${dateStr}, ${timeStr}</span>
+        <span class="history-score">${h.correct}/${h.answered} (${h.accuracy}%)</span>
+      </div>`;
+    }
+    html += "</div>";
+
+    const allAccuracies = history.map(h => h.accuracy);
+    const avg = Math.round(allAccuracies.reduce((a, b) => a + b, 0) / allAccuracies.length);
+    html += `<div class="history-avg">Average accuracy across ${history.length} game${history.length > 1 ? "s" : ""}: ${avg}%</div>`;
+
+    container.innerHTML = html;
   }
 
   function renderQuestion() {
@@ -54,12 +83,11 @@ const UI = (() => {
   }
 
   function renderFeedback(entry) {
-    lastFeedbackEntry = entry;
     const q = entry.question;
     const isCorrect = entry.result === "correct";
     const isSkipped = entry.result === "skipped";
 
-    elFeedbackIcon.textContent = isSkipped ? "--" : isCorrect ? "✓" : "✗";
+    elFeedbackIcon.textContent = isSkipped ? "--" : isCorrect ? "\u2713" : "\u2717";
     elFeedbackIcon.className = "fb-icon " + (isSkipped ? "skipped" : isCorrect ? "correct" : "incorrect");
 
     if (isSkipped) {
@@ -69,14 +97,20 @@ const UI = (() => {
     } else if (isCorrect) {
       elFeedbackTitle.textContent = "Correct!";
       elFeedbackHint.textContent = "";
-      elFeedbackYours.textContent = `Your answer: ${entry.userAnswer} ${q.unit}`;
+      const display = entry.rawInput !== String(entry.userAnswer)
+        ? `Your answer: ${entry.rawInput} = ${entry.userAnswer} ${q.unit}`
+        : `Your answer: ${entry.userAnswer} ${q.unit}`;
+      elFeedbackYours.textContent = display;
     } else {
       elFeedbackTitle.textContent = "Incorrect";
-      elFeedbackHint.textContent = entry.hint === "too_low" ? "↓ Your estimate was too low" : "↑ Your estimate was too high";
-      elFeedbackYours.textContent = `Your answer: ${entry.userAnswer} ${q.unit}`;
+      elFeedbackHint.textContent = entry.hint === "too_low" ? "\u2193 Your estimate was too low" : "\u2191 Your estimate was too high";
+      const display = entry.rawInput !== String(entry.userAnswer)
+        ? `Your answer: ${entry.rawInput} = ${entry.userAnswer} ${q.unit}`
+        : `Your answer: ${entry.userAnswer} ${q.unit}`;
+      elFeedbackYours.textContent = display;
     }
 
-    elFeedbackRef.textContent = `Reference: ${q.referenceAnswer} ${q.unit} (accepted: ${q.acceptableRange[0]}–${q.acceptableRange[1]})`;
+    elFeedbackRef.textContent = `Reference: ${q.referenceAnswer} ${q.unit} (accepted: ${q.acceptableRange[0]}\u2013${q.acceptableRange[1]})`;
     elFeedbackExplanation.textContent = q.explanation;
 
     if (!isCorrect) {
@@ -91,6 +125,7 @@ const UI = (() => {
   }
 
   function renderResults() {
+    Game.saveResults();
     const r = Game.getResults();
 
     elScore.textContent = `${r.correct} / ${r.answered} correct`;
@@ -128,6 +163,17 @@ const UI = (() => {
       elBreakdown.appendChild(row);
     }
 
+    // Show history summary on results screen
+    const history = Game.getHistory();
+    if (history.length > 1) {
+      const allAccuracies = history.map(h => h.accuracy);
+      const avg = Math.round(allAccuracies.reduce((a, b) => a + b, 0) / allAccuracies.length);
+      elHistory.textContent = `Lifetime: ${history.length} games played, ${avg}% average accuracy`;
+      elHistory.style.display = "block";
+    } else {
+      elHistory.style.display = "none";
+    }
+
     showScreen("results");
   }
 
@@ -149,7 +195,7 @@ const UI = (() => {
   document.getElementById("btn-skip").addEventListener("click", () => {
     Game.skipQuestion();
     const q = Game.getCurrentQuestion();
-    renderFeedback({ question: q, result: "skipped", userAnswer: null, hint: null });
+    renderFeedback({ question: q, result: "skipped", userAnswer: null, rawInput: null, hint: null });
   });
 
   elInput.addEventListener("keydown", (e) => {
@@ -172,6 +218,6 @@ const UI = (() => {
     renderQuestion();
   });
 
-  // Start on the start screen
-  showScreen("start");
+  // Initialize
+  renderStartScreen();
 })();

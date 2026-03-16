@@ -300,6 +300,53 @@ body {
   margin-top: 1.5rem;
 }
 
+/* History */
+.history-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+#start-history {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.history-list {
+  margin-bottom: 0.75rem;
+}
+
+.history-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.3rem 0;
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.history-date {
+  color: #6b7280;
+}
+
+.history-score {
+  font-weight: 500;
+}
+
+.history-avg {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-top: 0.75rem;
+  text-align: center;
+}
+
+code {
+  background: #eef2ff;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
 /* Responsive */
 @media (max-width: 480px) {
   .card {

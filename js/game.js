@@ -1,7 +1,9 @@
+const QUESTIONS_PER_GAME = 10;
+
 const Game = (() => {
   let questions = [];
   let currentIndex = 0;
-  let results = []; // { question, result: 'correct'|'incorrect'|'skipped', userAnswer }
+  let results = [];
 
   function shuffle(arr) {
     const a = [...arr];
@@ -13,7 +15,7 @@ const Game = (() => {
   }
 
   function startGame() {
-    questions = shuffle(QUESTIONS);
+    questions = shuffle(QUESTIONS).slice(0, QUESTIONS_PER_GAME);
     currentIndex = 0;
     results = [];
   }
@@ -36,7 +38,8 @@ const Game = (() => {
 
     const entry = {
       question,
-      userAnswer: parseFloat(userInput),
+      userAnswer: validation.evaluated,
+      rawInput: userInput.trim(),
       result: validation.correct ? "correct" : "incorrect",
       hint: validation.hint || null
     };
@@ -48,6 +51,7 @@ const Game = (() => {
     results.push({
       question: questions[currentIndex],
       userAnswer: null,
+      rawInput: null,
       result: "skipped",
       hint: null
     });
@@ -63,7 +67,6 @@ const Game = (() => {
     const correct = results.filter(r => r.result === "correct");
     const skipped = results.filter(r => r.result === "skipped");
 
-    // Per-topic breakdown
     const topicMap = {};
     for (const r of results) {
       const t = r.question.topic;
@@ -86,5 +89,31 @@ const Game = (() => {
     };
   }
 
-  return { startGame, getCurrentQuestion, getProgress, submitAnswer, skipQuestion, advance, getResults };
+  function saveResults() {
+    const r = getResults();
+    const entry = {
+      date: new Date().toISOString(),
+      correct: r.correct,
+      answered: r.answered,
+      skipped: r.skipped,
+      accuracy: r.accuracy,
+      topics: r.topics
+    };
+
+    try {
+      const history = JSON.parse(localStorage.getItem("sdep_history") || "[]");
+      history.push(entry);
+      localStorage.setItem("sdep_history", JSON.stringify(history));
+    } catch {}
+  }
+
+  function getHistory() {
+    try {
+      return JSON.parse(localStorage.getItem("sdep_history") || "[]");
+    } catch {
+      return [];
+    }
+  }
+
+  return { startGame, getCurrentQuestion, getProgress, submitAnswer, skipQuestion, advance, getResults, saveResults, getHistory };
 })();

@@ -15,24 +15,26 @@
         <h1 class="start-title">System Design Estimation Practice</h1>
         <p class="start-subtitle">
           Sharpen your back-of-napkin math for system design interviews.
-          30 questions across 12 topics — estimate values, get instant feedback,
-          and build your intuition for capacity planning.
+          10 random questions from 30 across 12 topics — estimate values,
+          get instant feedback, and build your intuition for capacity planning.
+          You can type expressions like <code>1000 * 10 / 4</code> as answers.
         </p>
         <button id="btn-start" class="btn btn-primary">Start Game</button>
+        <div id="start-history" style="display:none"></div>
       </div>
     </div>
 
     <!-- QUESTION SCREEN -->
     <div id="screen-question" class="screen">
       <div class="card">
-        <div class="progress-text" id="q-progress">Question 1 of 30</div>
+        <div class="progress-text" id="q-progress">Question 1 of 10</div>
         <div class="progress-bar-track">
           <div class="progress-bar-fill" id="q-progress-bar" style="width: 0%"></div>
         </div>
         <span class="topic-tag" id="q-topic">Topic</span>
         <p class="question-text" id="q-text">Question text here</p>
         <div class="input-group">
-          <input type="number" id="q-input" placeholder="Your estimate" step="any" />
+          <input type="text" id="q-input" placeholder="Your estimate (e.g. 64 / 2)" step="any" inputmode="decimal" />
           <span class="input-unit" id="q-unit">unit</span>
         </div>
         <div class="input-error" id="q-error"></div>
@@ -46,7 +48,7 @@
     <!-- FEEDBACK SCREEN -->
     <div id="screen-feedback" class="screen">
       <div class="card">
-        <div class="fb-icon" id="fb-icon">✓</div>
+        <div class="fb-icon" id="fb-icon">&#10003;</div>
         <div class="fb-title" id="fb-title">Correct!</div>
         <div class="fb-hint" id="fb-hint"></div>
         <div class="fb-yours" id="fb-yours"></div>
@@ -68,6 +70,7 @@
         </div>
         <div class="breakdown-title">Topic Breakdown</div>
         <div id="r-breakdown"></div>
+        <div class="history-avg" id="r-history" style="display:none"></div>
         <div class="results-btn-row">
           <button id="btn-restart" class="btn btn-primary">Play Again</button>
         </div>
