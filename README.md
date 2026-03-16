@@ -1,6 +1,6 @@
 # System Design Estimation Practice
 
-A gamified, Anki-style web app for practicing back-of-napkin math for system design interviews. 10 random questions per round from a bank of 30, covering 12 system design topics.
+A gamified, Anki-style web app for practicing back-of-napkin math for system design interviews. 10 random questions per round from a bank of 30+, covering multiple system design topics.
 
 ![Start screen](screenshots/start-screen.png)
 
@@ -16,9 +16,9 @@ A gamified, Anki-style web app for practicing back-of-napkin math for system des
 
 Open `index.html` in a browser, or visit [system-design-math-practice.tzvi.dev](https://system-design-math-practice.tzvi.dev).
 
-## Claude Code Skills
+## Agent Skills
 
-Two [Claude Code skills](https://docs.anthropic.com/en/docs/claude-code/skills) are included for managing the question bank:
+Two [Agent skills](https://agentskills.io/home) are included for managing the question bank:
 
 ```
 /audit-questions          # Read-only audit of all questions (math, ranges, clarity)
