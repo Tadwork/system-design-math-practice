@@ -16,16 +16,15 @@ A gamified, Anki-style web app for practicing back-of-napkin math for system des
 
 Open `index.html` in a browser, or visit [system-design-math-practice.tzvi.dev](https://system-design-math-practice.tzvi.dev).
 
-## Auditing Questions
+## Claude Code Skills
 
-A CLI tool is included to audit and update questions using Claude Code:
+Two [Claude Code skills](https://docs.anthropic.com/en/docs/claude-code/skills) are included for managing the question bank:
 
-```bash
-# Audit all questions — checks math, ranges, explanations
-./tools/audit-questions.sh
-
-# Audit and auto-apply fixes
-./tools/audit-questions.sh --fix
+```
+/audit-questions          # Read-only audit of all questions (math, ranges, clarity)
+/audit-questions --fix    # Audit and auto-apply corrections
+/add-questions            # Research and add new questions (picks gaps automatically)
+/add-questions DNS        # Add questions for a specific topic
 ```
 
 ## Tech Stack
