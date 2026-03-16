@@ -13,12 +13,12 @@ const QUESTIONS = [
   {
     id: 2,
     topic: "APIs",
-    question: "An API gateway rate-limits users to 100 req/sec. If you have 50,000 daily active users and each makes 200 requests/day spread over 8 active hours, what peak requests/sec should the gateway handle?",
-    unit: "thousand req/s",
-    acceptableRange: [0.2, 1.0],
-    referenceAnswer: 0.35,
-    explanation: "50,000 users × 200 req/day = 10M req/day. Over 8 hours = 10M / 28,800s ≈ 347 req/s. Peak is typically 2-3× average ≈ ~700-1,000 req/s.",
-    tip: "Calculate average first (total requests ÷ active seconds), then multiply by a peak factor (2-3×)."
+    question: "You have 50,000 daily active users and each makes 200 requests/day spread over 8 active hours. What's the average requests/sec the API gateway must handle?",
+    unit: "req/s",
+    acceptableRange: [200, 520],
+    referenceAnswer: 347,
+    explanation: "50,000 users × 200 req/day = 10M req/day. Over 8 hours = 10M / 28,800s ≈ 347 req/s.",
+    tip: "Average rate = total requests ÷ active seconds. For peak planning, multiply by a 2-3× factor."
   },
   {
     id: 3,
@@ -131,7 +131,7 @@ const QUESTIONS = [
   {
     id: 13,
     topic: "Auth & Security",
-    question: "A JWT token is 800 bytes. Your service validates 5,000 tokens/sec. Each validation does an RSA-2048 signature check taking 0.1 ms. What % of a single CPU core does token validation consume?",
+    question: "Your service validates 5,000 JWT tokens/sec. Each validation does an RSA-2048 signature check taking 0.1 ms. What % of a single CPU core does token validation consume?",
     unit: "percent",
     acceptableRange: [30, 75],
     referenceAnswer: 50,
@@ -153,12 +153,12 @@ const QUESTIONS = [
   {
     id: 15,
     topic: "Load Balancers",
-    question: "An L7 load balancer inspects HTTP headers, adding 0.5 ms latency per request. If it handles 20,000 req/sec, how many CPU-milliseconds per second does inspection alone consume?",
-    unit: "ms",
-    acceptableRange: [7000, 15000],
-    referenceAnswer: 10000,
+    question: "An L7 load balancer inspects HTTP headers, adding 0.5 ms of CPU time per request. If it handles 20,000 req/sec, how many CPU cores are needed just for header inspection?",
+    unit: "cores",
+    acceptableRange: [7, 15],
+    referenceAnswer: 10,
     explanation: "20,000 × 0.5 ms = 10,000 CPU-ms per second = 10 full CPU cores worth.",
-    tip: "Total CPU time = request rate × per-request overhead."
+    tip: "Total CPU-ms/s = request rate × per-request CPU time. Divide by 1,000 to get cores."
   },
 
   // === Caching (3) ===
