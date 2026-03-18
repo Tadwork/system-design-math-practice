@@ -108,7 +108,7 @@ body {
 /* Start screen */
 .start-shell {
   width: 100%;
-  padding: clamp(1.5rem, 2vw, 2.25rem);
+  padding: clamp(1rem, 1.4vw, 1.75rem);
   border: 1px solid var(--line);
   border-radius: 26px;
   background:
@@ -121,12 +121,13 @@ body {
   display: grid;
   grid-template-columns: minmax(0, 1.7fr) minmax(220px, 0.9fr);
   gap: clamp(1.5rem, 3vw, 3rem);
-  align-items: end;
+  align-items: start;
   padding-bottom: 1.5rem;
 }
 
 .start-copy {
   max-width: 42rem;
+  padding-top: 0.2rem;
 }
 
 .start-eyebrow {
@@ -281,6 +282,32 @@ body {
   text-align: right;
 }
 
+.resume-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding: 0.95rem 1rem;
+  border: 1px solid rgba(181, 93, 50, 0.18);
+  border-radius: 16px;
+  background: rgba(181, 93, 50, 0.06);
+}
+
+.resume-label {
+  margin-bottom: 0.25rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-deep);
+}
+
+.resume-copy {
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
 /* Buttons */
 .btn {
   display: inline-block;
@@ -410,6 +437,7 @@ body {
   display: flex;
   gap: 0.75rem;
   padding-top: 0.15rem;
+  flex-wrap: wrap;
 }
 
 /* Feedback screen */
@@ -658,6 +686,10 @@ code {
   }
   .start-action-note {
     text-align: left;
+  }
+  .resume-panel {
+    flex-direction: column;
+    align-items: flex-start;
   }
   .card-topline,
   .question-meta {

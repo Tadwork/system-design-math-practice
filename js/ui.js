@@ -34,7 +34,24 @@ const UI = (() => {
 
   function renderStartScreen() {
     renderHistoryOnStart();
+    renderResumePanel();
     showScreen("start");
+  }
+
+  function renderResumePanel() {
+    const panel = document.getElementById("resume-panel");
+    const copy = document.getElementById("resume-copy");
+    const summary = Game.getResumeSummary();
+
+    if (!summary) {
+      panel.style.display = "none";
+      return;
+    }
+
+    panel.style.display = "flex";
+    copy.textContent = summary.mode === "feedback"
+      ? `Saved at question ${summary.current} of ${summary.total}, waiting on feedback.`
+      : `Saved at question ${summary.current} of ${summary.total}.`;
   }
 
   function renderHistoryOnStart() {
@@ -47,7 +64,7 @@ const UI = (() => {
 
     container.style.display = "block";
     const recent = history.slice(-5).reverse();
-    let html = "<h3 class='history-title'>Recent Games</h3><div class='history-list'>";
+    let html = "<h3 class='history-title'>Recent Practice Rounds</h3><div class='history-list'>";
     for (const h of recent) {
       const d = new Date(h.date);
       const dateStr = d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
@@ -61,7 +78,7 @@ const UI = (() => {
 
     const allAccuracies = history.map(h => h.accuracy);
     const avg = Math.round(allAccuracies.reduce((a, b) => a + b, 0) / allAccuracies.length);
-    html += `<div class="history-avg">Average accuracy across ${history.length} game${history.length > 1 ? "s" : ""}: ${avg}%</div>`;
+    html += `<div class="history-avg">Average accuracy across ${history.length} practice round${history.length > 1 ? "s" : ""}: ${avg}%</div>`;
 
     container.innerHTML = html;
   }
@@ -168,7 +185,7 @@ const UI = (() => {
     if (history.length > 1) {
       const allAccuracies = history.map(h => h.accuracy);
       const avg = Math.round(allAccuracies.reduce((a, b) => a + b, 0) / allAccuracies.length);
-      elHistory.textContent = `Lifetime: ${history.length} games played, ${avg}% average accuracy`;
+      elHistory.textContent = `Lifetime: ${history.length} practice round${history.length > 1 ? "s" : ""} played, ${avg}% average accuracy`;
       elHistory.style.display = "block";
     } else {
       elHistory.style.display = "none";
@@ -180,6 +197,14 @@ const UI = (() => {
   // Event listeners
   document.getElementById("btn-start").addEventListener("click", () => {
     Game.startGame();
+    renderQuestion();
+  });
+
+  document.getElementById("btn-resume").addEventListener("click", () => {
+    if (Game.getMode() === "feedback" && Game.getLastEntry()) {
+      renderFeedback(Game.getLastEntry());
+      return;
+    }
     renderQuestion();
   });
 
@@ -196,6 +221,11 @@ const UI = (() => {
     Game.skipQuestion();
     const q = Game.getCurrentQuestion();
     renderFeedback({ question: q, result: "skipped", userAnswer: null, rawInput: null, hint: null });
+  });
+
+  document.getElementById("btn-finish").addEventListener("click", () => {
+    Game.skipToResults();
+    renderResults();
   });
 
   elInput.addEventListener("keydown", (e) => {

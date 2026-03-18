@@ -1,9 +1,57 @@
 const QUESTIONS_PER_GAME = 10;
+const ACTIVE_ROUND_KEY = "sdep_active_round_v1";
 
 const Game = (() => {
   let questions = [];
   let currentIndex = 0;
   let results = [];
+  let mode = "idle";
+
+  function persistState() {
+    try {
+      if (mode === "idle" || questions.length === 0) {
+        localStorage.removeItem(ACTIVE_ROUND_KEY);
+        return;
+      }
+
+      localStorage.setItem(ACTIVE_ROUND_KEY, JSON.stringify({
+        version: 1,
+        questions,
+        currentIndex,
+        results,
+        mode,
+        updatedAt: new Date().toISOString()
+      }));
+    } catch {}
+  }
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(ACTIVE_ROUND_KEY);
+      if (!raw) return false;
+
+      const saved = JSON.parse(raw);
+      if (!saved || !Array.isArray(saved.questions) || !Array.isArray(saved.results)) return false;
+      if (typeof saved.currentIndex !== "number" || saved.currentIndex < 0) return false;
+      if (saved.questions.length === 0) return false;
+
+      questions = saved.questions;
+      currentIndex = Math.min(saved.currentIndex, questions.length);
+      results = saved.results;
+      mode = saved.mode === "feedback" ? "feedback" : "question";
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  function clearActiveRound() {
+    mode = "idle";
+    questions = [];
+    currentIndex = 0;
+    results = [];
+    persistState();
+  }
 
   function shuffle(arr) {
     const a = [...arr];
@@ -18,6 +66,29 @@ const Game = (() => {
     questions = shuffle(QUESTIONS).slice(0, QUESTIONS_PER_GAME);
     currentIndex = 0;
     results = [];
+    mode = "question";
+    persistState();
+  }
+
+  function hasSavedRound() {
+    return mode !== "idle" && questions.length > 0 && currentIndex < questions.length;
+  }
+
+  function getMode() {
+    return mode;
+  }
+
+  function getResumeSummary() {
+    if (!hasSavedRound()) return null;
+    return {
+      current: currentIndex + 1,
+      total: questions.length,
+      mode
+    };
+  }
+
+  function getLastEntry() {
+    return results[results.length - 1] || null;
   }
 
   function getCurrentQuestion() {
@@ -44,6 +115,8 @@ const Game = (() => {
       hint: validation.hint || null
     };
     results.push(entry);
+    mode = "feedback";
+    persistState();
     return entry;
   }
 
@@ -55,11 +128,30 @@ const Game = (() => {
       result: "skipped",
       hint: null
     });
+    mode = "feedback";
+    persistState();
   }
 
   function advance() {
     currentIndex++;
+    mode = currentIndex < questions.length ? "question" : "idle";
+    persistState();
     return currentIndex < questions.length;
+  }
+
+  function skipToResults() {
+    while (currentIndex < questions.length) {
+      results.push({
+        question: questions[currentIndex],
+        userAnswer: null,
+        rawInput: null,
+        result: "skipped",
+        hint: null
+      });
+      currentIndex++;
+    }
+    mode = "idle";
+    persistState();
   }
 
   function getResults() {
@@ -105,6 +197,8 @@ const Game = (() => {
       history.push(entry);
       localStorage.setItem("sdep_history", JSON.stringify(history));
     } catch {}
+
+    clearActiveRound();
   }
 
   function getHistory() {
@@ -115,5 +209,22 @@ const Game = (() => {
     }
   }
 
-  return { startGame, getCurrentQuestion, getProgress, submitAnswer, skipQuestion, advance, getResults, saveResults, getHistory };
+  loadState();
+
+  return {
+    startGame,
+    hasSavedRound,
+    getMode,
+    getResumeSummary,
+    getLastEntry,
+    getCurrentQuestion,
+    getProgress,
+    submitAnswer,
+    skipQuestion,
+    advance,
+    skipToResults,
+    getResults,
+    saveResults,
+    getHistory
+  };
 })();
