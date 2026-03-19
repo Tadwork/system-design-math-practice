@@ -230,6 +230,7 @@ const UI = (() => {
 
   elInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
+      e.preventDefault();
       document.getElementById("btn-submit").click();
     }
   });

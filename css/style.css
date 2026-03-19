@@ -31,6 +31,43 @@ body {
   padding: 1.5rem;
 }
 
+.github-ribbon {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 12rem;
+  height: 12rem;
+  overflow: hidden;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.github-ribbon a {
+  position: absolute;
+  top: 3rem;
+  right: -3.5rem;
+  display: block;
+  width: 15rem;
+  padding: 0.65rem 0;
+  background: var(--ink);
+  color: var(--paper);
+  text-align: center;
+  text-decoration: none;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transform: rotate(45deg);
+  transform-origin: center;
+  box-shadow: 0 12px 26px rgba(49, 38, 20, 0.18);
+  pointer-events: auto;
+}
+
+.github-ribbon a:hover,
+.github-ribbon a:focus-visible {
+  background: var(--accent-deep);
+}
+
 .container {
   width: 100%;
   max-width: 920px;
@@ -705,6 +742,16 @@ code {
 }
 
 @media (max-width: 480px) {
+  .github-ribbon {
+    width: 9rem;
+    height: 9rem;
+  }
+  .github-ribbon a {
+    top: 2.25rem;
+    right: -3.9rem;
+    width: 13rem;
+    font-size: 0.7rem;
+  }
   .card {
     padding: 1.25rem;
   }
